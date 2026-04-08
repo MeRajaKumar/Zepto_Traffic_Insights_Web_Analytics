@@ -1,515 +1,880 @@
 
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="light">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Zepto Web Analytics — Final Project | Raja Kumar | 24MCA20229</title>
+<title>Zepto Web Analytics — Raja Kumar | 24MCA20229</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
-<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+/* ═══════════════════════════════════════════════
+   THEME TOKENS
+═══════════════════════════════════════════════ */
+:root {
+  --accent:        #e63327;
+  --accent-glow:   rgba(230,51,39,0.18);
+  --accent-soft:   rgba(230,51,39,0.08);
+  --green:         #22c55e;
+  --green-soft:    rgba(34,197,94,0.1);
+  --blue:          #3b82f6;
+  --blue-soft:     rgba(59,130,246,0.1);
+  --amber:         #f59e0b;
+  --amber-soft:    rgba(245,158,11,0.1);
+  --purple:        #a855f7;
+  --purple-soft:   rgba(168,85,247,0.1);
 
-  :root {
-    --red: #c0392b;
-    --red-light: #e74c3c;
-    --red-bg: #fdecea;
-    --blue: #2980b9;
-    --green: #27ae60;
-    --green-bg: #eafaf1;
-    --amber: #f39c12;
-    --amber-bg: #fef9e7;
-    --purple: #8e44ad;
-    --bg: #f7f5f2;
-    --surface: #ffffff;
-    --surface2: #f1efe8;
-    --border: rgba(0,0,0,0.08);
-    --border2: rgba(0,0,0,0.14);
-    --text: #1a1a1a;
-    --text2: #5a5a5a;
-    --text3: #999;
-    --radius: 12px;
-    --radius-sm: 8px;
-    --shadow: 0 1px 3px rgba(0,0,0,0.06), 0 4px 16px rgba(0,0,0,0.04);
-  }
+  --radius-xs: 6px;
+  --radius-sm: 10px;
+  --radius-md: 14px;
+  --radius-lg: 20px;
+  --radius-xl: 28px;
 
-  body {
-    font-family: 'Sora', sans-serif;
-    background: var(--bg);
-    color: var(--text);
-    font-size: 14px;
-    line-height: 1.6;
-    min-height: 100vh;
-  }
+  --transition: 0.22s cubic-bezier(.4,0,.2,1);
+}
 
-  /* ── HEADER ── */
-  .site-header {
-    background: var(--red);
-    padding: 0 2rem;
-    position: sticky;
-    top: 0;
-    z-index: 100;
-    box-shadow: 0 2px 12px rgba(192,57,43,0.3);
-  }
-  .header-inner {
-    max-width: 1200px;
-    margin: 0 auto;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    height: 60px;
-    gap: 16px;
-  }
-  .logo-area { display: flex; align-items: center; gap: 12px; }
-  .logo-badge {
-    background: rgba(255,255,255,0.18);
-    border: 1px solid rgba(255,255,255,0.3);
-    border-radius: 8px;
-    padding: 5px 14px;
-    font-size: 17px;
-    font-weight: 600;
-    color: #fff;
-    letter-spacing: -0.5px;
-  }
-  .header-title { color: rgba(255,255,255,0.9); font-size: 13px; font-weight: 400; }
-  .header-meta { color: rgba(255,255,255,0.65); font-size: 11px; font-family: 'JetBrains Mono', monospace; }
+[data-theme="light"] {
+  --bg:          #f0ede8;
+  --bg2:         #e8e4de;
+  --surface:     #ffffff;
+  --surface2:    #f8f6f3;
+  --surface3:    #f0ede8;
+  --border:      rgba(0,0,0,0.07);
+  --border2:     rgba(0,0,0,0.12);
+  --text:        #111111;
+  --text2:       #555555;
+  --text3:       #999999;
+  --shadow-sm:   0 1px 3px rgba(0,0,0,0.06), 0 2px 8px rgba(0,0,0,0.04);
+  --shadow-md:   0 4px 16px rgba(0,0,0,0.08), 0 1px 4px rgba(0,0,0,0.04);
+  --shadow-lg:   0 12px 40px rgba(0,0,0,0.12), 0 4px 12px rgba(0,0,0,0.06);
+  --header-bg:   #111111;
+  --header-text: #ffffff;
+  --chart-grid:  rgba(0,0,0,0.05);
+  --chart-text:  #999;
+}
 
-  /* ── NAV ── */
-  .nav-bar {
-    background: var(--surface);
-    border-bottom: 1px solid var(--border);
-    padding: 0 2rem;
-    position: sticky;
-    top: 60px;
-    z-index: 99;
-  }
-  .nav-inner {
-    max-width: 1200px;
-    margin: 0 auto;
-    display: flex;
-    gap: 0;
-    overflow-x: auto;
-  }
-  .nav-btn {
-    padding: 14px 20px;
-    border: none;
-    background: none;
-    cursor: pointer;
-    font-family: 'Sora', sans-serif;
-    font-size: 13px;
-    font-weight: 400;
-    color: var(--text2);
-    border-bottom: 2.5px solid transparent;
-    white-space: nowrap;
-    transition: color 0.15s, border-color 0.15s;
-  }
-  .nav-btn:hover { color: var(--text); }
-  .nav-btn.active { color: var(--red); border-bottom-color: var(--red); font-weight: 500; }
+[data-theme="dark"] {
+  --bg:          #0c0c0f;
+  --bg2:         #111116;
+  --surface:     #16161d;
+  --surface2:    #1c1c25;
+  --surface3:    #22222e;
+  --border:      rgba(255,255,255,0.06);
+  --border2:     rgba(255,255,255,0.12);
+  --text:        #f0f0f5;
+  --text2:       #a0a0b0;
+  --text3:       #606070;
+  --shadow-sm:   0 1px 3px rgba(0,0,0,0.4), 0 2px 8px rgba(0,0,0,0.3);
+  --shadow-md:   0 4px 16px rgba(0,0,0,0.5), 0 1px 4px rgba(0,0,0,0.3);
+  --shadow-lg:   0 12px 40px rgba(0,0,0,0.6), 0 4px 12px rgba(0,0,0,0.4);
+  --header-bg:   #0c0c0f;
+  --header-text: #f0f0f5;
+  --chart-grid:  rgba(255,255,255,0.04);
+  --chart-text:  #606070;
+}
 
-  /* ── LAYOUT ── */
-  .main { max-width: 1200px; margin: 0 auto; padding: 2rem; }
-  .section { display: none; animation: fadeIn 0.2s ease; }
-  .section.active { display: block; }
-  @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+/* ═══════════════════════════════════════════════
+   RESET + BASE
+═══════════════════════════════════════════════ */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-  /* ── CARDS ── */
-  .card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: 1.25rem 1.5rem;
-    margin-bottom: 1rem;
-    box-shadow: var(--shadow);
-  }
-  .card-title {
-    font-size: 13px;
-    font-weight: 500;
-    color: var(--text2);
-    text-transform: uppercase;
-    letter-spacing: 0.06em;
-    margin-bottom: 1rem;
-    padding-bottom: 0.75rem;
-    border-bottom: 1px solid var(--border);
-  }
+html { scroll-behavior: smooth; }
 
-  /* ── METRIC CARDS ── */
-  .grid-4 { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; margin-bottom: 1rem; }
-  .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1rem; margin-bottom: 1rem; }
-  .grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin-bottom: 1rem; }
+body {
+  font-family: 'Outfit', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  font-size: 14px;
+  line-height: 1.65;
+  min-height: 100vh;
+  transition: background var(--transition), color var(--transition);
+}
 
-  .metric-card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: 1.1rem 1.25rem;
-    box-shadow: var(--shadow);
-  }
-  .metric-card.accent-red { border-top: 3px solid var(--red); }
-  .metric-card.accent-blue { border-top: 3px solid var(--blue); }
-  .metric-card.accent-green { border-top: 3px solid var(--green); }
-  .metric-card.accent-amber { border-top: 3px solid var(--amber); }
-  .metric-label { font-size: 11px; color: var(--text3); font-weight: 500; letter-spacing: 0.05em; text-transform: uppercase; margin-bottom: 6px; }
-  .metric-value { font-size: 26px; font-weight: 600; color: var(--text); line-height: 1.2; }
-  .metric-change { font-size: 11px; margin-top: 5px; font-family: 'JetBrains Mono', monospace; }
-  .up { color: var(--green); }
-  .down-good { color: var(--green); }
-  .down-bad { color: var(--red); }
+/* ═══════════════════════════════════════════════
+   HEADER
+═══════════════════════════════════════════════ */
+.site-header {
+  background: var(--header-bg);
+  padding: 0 2rem;
+  position: sticky;
+  top: 0;
+  z-index: 200;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+}
 
-  /* ── TABLES ── */
-  .table { width: 100%; border-collapse: collapse; font-size: 13px; }
-  .table th { text-align: left; padding: 8px 12px; color: var(--text3); font-weight: 500; font-size: 11px; letter-spacing: 0.05em; text-transform: uppercase; border-bottom: 1px solid var(--border); }
-  .table td { padding: 9px 12px; border-bottom: 1px solid var(--border); color: var(--text); }
-  .table tr:last-child td { border-bottom: none; }
-  .table tr:hover td { background: var(--surface2); }
+.header-inner {
+  max-width: 1280px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 64px;
+  gap: 16px;
+}
 
-  /* ── BADGES ── */
-  .badge { display: inline-block; padding: 2px 9px; border-radius: 20px; font-size: 11px; font-weight: 500; }
-  .badge-success { background: var(--green-bg); color: #1a7a45; }
-  .badge-warn { background: var(--amber-bg); color: #9a7d0a; }
-  .badge-danger { background: var(--red-bg); color: #a93226; }
-  .badge-info { background: #eaf2fb; color: #1a5f8a; }
+.logo-group { display: flex; align-items: center; gap: 14px; }
 
-  /* ── TAGS ── */
-  .tag { display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 500; margin: 3px; }
-  .tag-red { background: var(--red-bg); color: #a93226; }
-  .tag-blue { background: #eaf2fb; color: #1a5f8a; }
-  .tag-green { background: var(--green-bg); color: #1a7a45; }
-  .tag-amber { background: var(--amber-bg); color: #9a7d0a; }
-  .tag-purple { background: #f5eafb; color: #6c3483; }
+.logo-pill {
+  background: var(--accent);
+  color: #fff;
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+  padding: 5px 14px;
+  border-radius: 8px;
+  box-shadow: 0 0 20px var(--accent-glow);
+}
 
-  /* ── CHART WRAPPER ── */
-  .chart-wrap { position: relative; width: 100%; }
+.header-tagline { color: rgba(255,255,255,0.45); font-size: 12px; }
+.header-tagline strong { color: rgba(255,255,255,0.8); font-weight: 500; }
 
-  /* ── FUNNEL ── */
-  .funnel-step { display: flex; align-items: center; gap: 12px; margin-bottom: 8px; }
-  .funnel-label { font-size: 12px; color: var(--text2); min-width: 120px; }
-  .funnel-bar-wrap { flex: 1; height: 30px; background: var(--surface2); border-radius: 6px; overflow: hidden; }
-  .funnel-bar { height: 100%; display: flex; align-items: center; padding-left: 10px; font-size: 11px; font-weight: 500; color: #fff; border-radius: 6px; transition: width 0.5s ease; }
-  .funnel-num { font-size: 12px; color: var(--text2); min-width: 55px; text-align: right; font-family: 'JetBrains Mono', monospace; }
+.header-right { display: flex; align-items: center; gap: 12px; }
 
-  /* ── CHANNELS ── */
-  .channel-bar { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
-  .channel-name { font-size: 12px; color: var(--text2); min-width: 100px; }
-  .channel-fill { height: 26px; border-radius: 5px; display: flex; align-items: center; padding: 0 10px; font-size: 11px; font-weight: 500; color: #fff; min-width: 40px; }
-  .channel-pct { font-size: 12px; color: var(--text3); min-width: 35px; font-family: 'JetBrains Mono', monospace; }
+.theme-toggle {
+  width: 44px; height: 24px;
+  background: rgba(255,255,255,0.1);
+  border: 1px solid rgba(255,255,255,0.15);
+  border-radius: 12px;
+  cursor: pointer;
+  position: relative;
+  transition: background var(--transition);
+  flex-shrink: 0;
+}
+.theme-toggle::after {
+  content: '';
+  position: absolute;
+  top: 3px; left: 3px;
+  width: 16px; height: 16px;
+  border-radius: 50%;
+  background: #fff;
+  transition: transform var(--transition);
+}
+[data-theme="dark"] .theme-toggle::after { transform: translateX(20px); }
+[data-theme="dark"] .theme-toggle { background: rgba(230,51,39,0.3); border-color: var(--accent); }
 
-  /* ── PROGRESS BARS ── */
-  .progress-row { margin-bottom: 10px; }
-  .progress-head { display: flex; justify-content: space-between; font-size: 12px; color: var(--text2); margin-bottom: 4px; }
-  .progress-bar { height: 7px; border-radius: 4px; background: var(--surface2); overflow: hidden; }
-  .progress-fill { height: 100%; border-radius: 4px; }
+.theme-label { font-size: 11px; color: rgba(255,255,255,0.5); font-family: 'JetBrains Mono', monospace; }
 
-  /* ── ROI CALCULATOR ── */
-  .roi-section { background: var(--surface2); border-radius: var(--radius-sm); padding: 1.25rem; margin-bottom: 1rem; }
-  .roi-row { display: flex; align-items: center; gap: 14px; margin-bottom: 14px; }
-  .roi-row:last-child { margin-bottom: 0; }
-  .roi-label { font-size: 12px; color: var(--text2); min-width: 140px; font-weight: 500; }
-  .roi-row input[type=range] {
-    flex: 1;
-    -webkit-appearance: none;
-    height: 4px;
-    border-radius: 2px;
-    background: var(--border2);
-    outline: none;
-    cursor: pointer;
-  }
-  .roi-row input[type=range]::-webkit-slider-thumb {
-    -webkit-appearance: none;
-    width: 16px; height: 16px;
-    border-radius: 50%;
-    background: var(--red);
-    cursor: pointer;
-    border: 2px solid #fff;
-    box-shadow: 0 1px 4px rgba(192,57,43,0.4);
-  }
-  .roi-val { font-size: 13px; font-weight: 500; min-width: 75px; text-align: right; font-family: 'JetBrains Mono', monospace; color: var(--text); }
+.header-badge {
+  background: rgba(255,255,255,0.07);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 6px;
+  padding: 4px 10px;
+  font-size: 11px;
+  color: rgba(255,255,255,0.55);
+  font-family: 'JetBrains Mono', monospace;
+}
 
-  /* ── FORMULA CARDS ── */
-  .formula-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 12px; margin-top: 12px; }
-  .formula-card { background: var(--surface2); border-radius: var(--radius-sm); padding: 14px; border-left: 3px solid var(--red); }
-  .formula-name { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.07em; color: var(--text3); margin-bottom: 6px; }
-  .formula-eq { font-size: 12px; font-weight: 500; color: var(--text); font-family: 'JetBrains Mono', monospace; margin-bottom: 6px; line-height: 1.5; }
-  .formula-result { font-size: 11px; color: var(--green); font-family: 'JetBrains Mono', monospace; }
+/* ═══════════════════════════════════════════════
+   NAV BAR
+═══════════════════════════════════════════════ */
+.nav-bar {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 0 2rem;
+  position: sticky;
+  top: 64px;
+  z-index: 100;
+  box-shadow: var(--shadow-sm);
+  transition: background var(--transition);
+}
 
-  /* ── INSIGHT ROWS ── */
-  .insight-row { display: flex; gap: 10px; margin-bottom: 12px; align-items: flex-start; }
-  .insight-dot { width: 7px; height: 7px; border-radius: 50%; margin-top: 6px; flex-shrink: 0; }
-  .insight-text { font-size: 13px; color: var(--text); line-height: 1.6; }
+.nav-inner {
+  max-width: 1280px;
+  margin: 0 auto;
+  display: flex;
+  gap: 0;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.nav-inner::-webkit-scrollbar { display: none; }
 
-  /* ── SECTION INTRO ── */
-  .section-intro { display: flex; align-items: center; gap: 12px; margin-bottom: 1.25rem; padding-bottom: 1rem; border-bottom: 1px solid var(--border); }
-  .section-icon { width: 36px; height: 36px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 18px; }
-  .section-icon.red { background: var(--red-bg); }
-  .section-intro-text h2 { font-size: 18px; font-weight: 600; color: var(--text); }
-  .section-intro-text p { font-size: 12px; color: var(--text3); margin-top: 2px; }
+.nav-btn {
+  padding: 15px 22px;
+  border: none;
+  background: none;
+  cursor: pointer;
+  font-family: 'Outfit', sans-serif;
+  font-size: 13px;
+  font-weight: 400;
+  color: var(--text3);
+  border-bottom: 2px solid transparent;
+  white-space: nowrap;
+  transition: color var(--transition), border-color var(--transition);
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  letter-spacing: 0.01em;
+}
+.nav-btn:hover { color: var(--text); }
+.nav-btn.active { color: var(--accent); border-bottom-color: var(--accent); font-weight: 600; }
+.nav-btn .nav-icon { font-size: 14px; }
 
-  /* ── FOOTER ── */
-  .site-footer { background: var(--surface); border-top: 1px solid var(--border); padding: 1.5rem 2rem; margin-top: 2rem; text-align: center; }
-  .footer-text { font-size: 12px; color: var(--text3); }
-  .footer-text strong { color: var(--text2); }
+/* ═══════════════════════════════════════════════
+   LAYOUT
+═══════════════════════════════════════════════ */
+.main {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 2rem;
+}
 
-  /* ── SCROLLBAR ── */
-  ::-webkit-scrollbar { width: 6px; height: 6px; }
-  ::-webkit-scrollbar-track { background: transparent; }
-  ::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.15); border-radius: 3px; }
+.section { display: none; }
+.section.active {
+  display: block;
+  animation: sectionIn 0.3s cubic-bezier(.4,0,.2,1);
+}
+@keyframes sectionIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
 
-  @media (max-width: 640px) {
-    .main { padding: 1rem; }
-    .metric-value { font-size: 20px; }
-    .header-inner { flex-wrap: wrap; height: auto; padding: 10px 0; }
-  }
+/* ═══════════════════════════════════════════════
+   SECTION HERO
+═══════════════════════════════════════════════ */
+.section-hero {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 1.5rem 2rem;
+  margin-bottom: 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  box-shadow: var(--shadow-sm);
+  position: relative;
+  overflow: hidden;
+}
+.section-hero::before {
+  content: '';
+  position: absolute;
+  right: -40px; top: -40px;
+  width: 160px; height: 160px;
+  background: var(--accent-soft);
+  border-radius: 50%;
+  pointer-events: none;
+}
+.section-hero-left { display: flex; align-items: center; gap: 14px; }
+.hero-icon {
+  width: 48px; height: 48px;
+  background: var(--accent-soft);
+  border: 1px solid rgba(230,51,39,0.15);
+  border-radius: var(--radius-sm);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 22px;
+  flex-shrink: 0;
+}
+.hero-title { font-size: 20px; font-weight: 700; color: var(--text); letter-spacing: -0.3px; }
+.hero-sub { font-size: 12px; color: var(--text3); margin-top: 2px; }
+.hero-chip {
+  background: var(--accent-soft);
+  border: 1px solid rgba(230,51,39,0.2);
+  color: var(--accent);
+  font-size: 11px;
+  font-weight: 600;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-family: 'JetBrains Mono', monospace;
+  letter-spacing: 0.05em;
+  white-space: nowrap;
+}
+
+/* ═══════════════════════════════════════════════
+   CARDS
+═══════════════════════════════════════════════ */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 1.4rem 1.6rem;
+  margin-bottom: 1rem;
+  box-shadow: var(--shadow-sm);
+  transition: background var(--transition), border-color var(--transition), box-shadow var(--transition);
+}
+.card:hover { box-shadow: var(--shadow-md); }
+
+.card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+  padding-bottom: 0.85rem;
+  border-bottom: 1px solid var(--border);
+}
+.card-title {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text3);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+.card-badge {
+  font-size: 10px;
+  font-weight: 600;
+  padding: 3px 9px;
+  border-radius: 20px;
+  font-family: 'JetBrains Mono', monospace;
+  letter-spacing: 0.04em;
+}
+.card-badge.live { background: rgba(34,197,94,0.12); color: #16a34a; border: 1px solid rgba(34,197,94,0.2); }
+.card-badge.exp  { background: var(--blue-soft); color: #2563eb; border: 1px solid rgba(59,130,246,0.2); }
+
+/* ═══════════════════════════════════════════════
+   METRIC CARDS
+═══════════════════════════════════════════════ */
+.grid-4 { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 14px; margin-bottom: 1rem; }
+.grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 14px; margin-bottom: 1rem; }
+.grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 1rem; margin-bottom: 1rem; }
+
+.metric-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 1.2rem 1.4rem;
+  box-shadow: var(--shadow-sm);
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+.metric-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); }
+.metric-card::after {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+  border-radius: var(--radius-md) var(--radius-md) 0 0;
+}
+.metric-card.red::after   { background: var(--accent); box-shadow: 0 0 12px var(--accent-glow); }
+.metric-card.blue::after  { background: var(--blue); }
+.metric-card.green::after { background: var(--green); }
+.metric-card.amber::after { background: var(--amber); }
+.metric-card.purple::after { background: var(--purple); }
+
+.metric-label {
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text3);
+  margin-bottom: 8px;
+}
+.metric-value {
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--text);
+  letter-spacing: -0.5px;
+  line-height: 1.1;
+}
+.metric-sub {
+  font-size: 11px;
+  margin-top: 6px;
+  font-family: 'JetBrains Mono', monospace;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.metric-sub.up     { color: var(--green); }
+.metric-sub.ok     { color: var(--green); }
+.metric-sub.warn   { color: var(--amber); }
+.metric-sub.down   { color: var(--accent); }
+
+/* ═══════════════════════════════════════════════
+   TABLES
+═══════════════════════════════════════════════ */
+.table-wrap { overflow-x: auto; }
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+.table th {
+  text-align: left;
+  padding: 8px 14px;
+  color: var(--text3);
+  font-weight: 600;
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  border-bottom: 1px solid var(--border2);
+  white-space: nowrap;
+}
+.table td {
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--border);
+  color: var(--text);
+  transition: background var(--transition);
+}
+.table tr:last-child td { border-bottom: none; }
+.table tbody tr:hover td { background: var(--surface2); }
+
+/* ═══════════════════════════════════════════════
+   BADGES
+═══════════════════════════════════════════════ */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 600;
+  font-family: 'JetBrains Mono', monospace;
+}
+.badge-success { background: rgba(34,197,94,0.12); color: #16a34a; border: 1px solid rgba(34,197,94,0.2); }
+.badge-warn    { background: rgba(245,158,11,0.12); color: #b45309; border: 1px solid rgba(245,158,11,0.2); }
+.badge-danger  { background: rgba(230,51,39,0.1);  color: var(--accent); border: 1px solid rgba(230,51,39,0.2); }
+.badge-info    { background: var(--blue-soft); color: #2563eb; border: 1px solid rgba(59,130,246,0.2); }
+.badge-purple  { background: var(--purple-soft); color: #9333ea; border: 1px solid rgba(168,85,247,0.2); }
+
+/* ═══════════════════════════════════════════════
+   TAGS
+═══════════════════════════════════════════════ */
+.tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 13px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 500;
+  margin: 3px;
+  border: 1px solid transparent;
+  transition: transform 0.15s;
+}
+.tag:hover { transform: translateY(-1px); }
+.tag-red    { background: rgba(230,51,39,0.08);  color: var(--accent);  border-color: rgba(230,51,39,0.15); }
+.tag-blue   { background: var(--blue-soft);       color: #2563eb;        border-color: rgba(59,130,246,0.15); }
+.tag-green  { background: var(--green-soft);      color: #16a34a;        border-color: rgba(34,197,94,0.15); }
+.tag-amber  { background: var(--amber-soft);      color: #b45309;        border-color: rgba(245,158,11,0.15); }
+.tag-purple { background: var(--purple-soft);     color: #9333ea;        border-color: rgba(168,85,247,0.15); }
+
+/* ═══════════════════════════════════════════════
+   CHART WRAPPER
+═══════════════════════════════════════════════ */
+.chart-wrap { position: relative; width: 100%; }
+
+/* ═══════════════════════════════════════════════
+   FUNNEL
+═══════════════════════════════════════════════ */
+.funnel-step { display: flex; align-items: center; gap: 12px; margin-bottom: 9px; }
+.funnel-label { font-size: 12px; color: var(--text2); min-width: 120px; }
+.funnel-bar-wrap { flex: 1; height: 32px; background: var(--surface2); border-radius: 8px; overflow: hidden; border: 1px solid var(--border); }
+.funnel-bar {
+  height: 100%;
+  display: flex; align-items: center;
+  padding-left: 12px;
+  font-size: 11px; font-weight: 600;
+  color: #fff;
+  border-radius: 8px;
+  transition: width 0.8s cubic-bezier(.4,0,.2,1);
+  font-family: 'JetBrains Mono', monospace;
+}
+.funnel-num { font-size: 11px; color: var(--text3); min-width: 48px; text-align: right; font-family: 'JetBrains Mono', monospace; }
+
+/* ═══════════════════════════════════════════════
+   CHANNELS
+═══════════════════════════════════════════════ */
+.channel-row { display: flex; align-items: center; gap: 12px; margin-bottom: 11px; }
+.channel-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+.channel-name { font-size: 12px; color: var(--text2); min-width: 110px; }
+.channel-bar-wrap { flex: 1; height: 8px; background: var(--surface2); border-radius: 4px; overflow: hidden; }
+.channel-fill { height: 100%; border-radius: 4px; transition: width 0.7s cubic-bezier(.4,0,.2,1); }
+.channel-pct { font-size: 11px; color: var(--text3); min-width: 32px; text-align: right; font-family: 'JetBrains Mono', monospace; font-weight: 500; }
+
+/* ═══════════════════════════════════════════════
+   PROGRESS BARS
+═══════════════════════════════════════════════ */
+.progress-row { margin-bottom: 11px; }
+.progress-head { display: flex; justify-content: space-between; margin-bottom: 5px; }
+.progress-key { font-size: 12px; color: var(--text2); }
+.progress-val { font-size: 12px; font-weight: 600; font-family: 'JetBrains Mono', monospace; }
+.progress-bar { height: 7px; background: var(--surface2); border-radius: 4px; overflow: hidden; border: 1px solid var(--border); }
+.progress-fill { height: 100%; border-radius: 4px; transition: width 0.8s cubic-bezier(.4,0,.2,1); }
+
+/* ═══════════════════════════════════════════════
+   FORMULA GRID
+═══════════════════════════════════════════════ */
+.formula-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 12px; margin-top: 1rem; }
+.formula-card {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--accent);
+  border-radius: var(--radius-sm);
+  padding: 14px 16px;
+  transition: background var(--transition);
+}
+.formula-card:hover { background: var(--surface3); }
+.formula-name { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: var(--accent); margin-bottom: 6px; }
+.formula-eq { font-size: 11.5px; font-family: 'JetBrains Mono', monospace; color: var(--text); margin-bottom: 7px; line-height: 1.6; font-weight: 500; }
+.formula-res { font-size: 11px; font-family: 'JetBrains Mono', monospace; color: var(--green); font-weight: 500; }
+
+/* ═══════════════════════════════════════════════
+   INSIGHT ROWS
+═══════════════════════════════════════════════ */
+.insight-row { display: flex; gap: 11px; margin-bottom: 13px; align-items: flex-start; }
+.insight-dot { width: 7px; height: 7px; border-radius: 50%; margin-top: 6px; flex-shrink: 0; }
+.insight-text { font-size: 13px; color: var(--text); line-height: 1.65; }
+
+/* ═══════════════════════════════════════════════
+   ROI SLIDERS
+═══════════════════════════════════════════════ */
+.roi-panel { background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 1.4rem; margin-bottom: 1rem; }
+.roi-row { display: flex; align-items: center; gap: 14px; margin-bottom: 16px; }
+.roi-row:last-child { margin-bottom: 0; }
+.roi-label { font-size: 12px; color: var(--text2); min-width: 155px; font-weight: 500; }
+
+input[type=range] {
+  flex: 1;
+  -webkit-appearance: none;
+  appearance: none;
+  height: 5px;
+  border-radius: 3px;
+  background: var(--border2);
+  outline: none;
+  cursor: pointer;
+}
+input[type=range]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 18px; height: 18px;
+  border-radius: 50%;
+  background: var(--accent);
+  cursor: pointer;
+  border: 3px solid var(--surface);
+  box-shadow: 0 0 0 1px var(--accent), 0 2px 8px var(--accent-glow);
+  transition: box-shadow 0.15s;
+}
+input[type=range]::-webkit-slider-thumb:hover {
+  box-shadow: 0 0 0 4px var(--accent-glow), 0 2px 8px var(--accent-glow);
+}
+.roi-val {
+  font-size: 13px;
+  font-weight: 600;
+  min-width: 80px;
+  text-align: right;
+  font-family: 'JetBrains Mono', monospace;
+  color: var(--text);
+}
+
+/* ═══════════════════════════════════════════════
+   ROI RESULT BIG NUMBER
+═══════════════════════════════════════════════ */
+.roi-big {
+  text-align: center;
+  padding: 1.5rem;
+  background: var(--accent-soft);
+  border: 1px solid rgba(230,51,39,0.15);
+  border-radius: var(--radius-md);
+  margin-bottom: 1rem;
+}
+.roi-big-label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text3); margin-bottom: 6px; }
+.roi-big-value { font-size: 52px; font-weight: 700; color: var(--accent); letter-spacing: -2px; line-height: 1; font-family: 'JetBrains Mono', monospace; }
+.roi-big-sub { font-size: 12px; color: var(--text3); margin-top: 6px; }
+
+/* ═══════════════════════════════════════════════
+   DETAIL TABLE CARD (student info)
+═══════════════════════════════════════════════ */
+.info-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 8px; }
+.info-item {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  padding: 8px 12px;
+  background: var(--surface2);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+}
+.info-key { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.07em; color: var(--text3); min-width: 70px; }
+.info-val { font-size: 13px; font-weight: 500; color: var(--text); }
+
+/* ═══════════════════════════════════════════════
+   FOOTER
+═══════════════════════════════════════════════ */
+.site-footer {
+  background: var(--header-bg);
+  border-top: 1px solid rgba(255,255,255,0.05);
+  padding: 1.5rem 2rem;
+  margin-top: 3rem;
+  text-align: center;
+}
+.footer-text { font-size: 12px; color: rgba(255,255,255,0.3); line-height: 1.8; }
+.footer-text strong { color: rgba(255,255,255,0.6); }
+
+/* ═══════════════════════════════════════════════
+   SCROLLBAR
+═══════════════════════════════════════════════ */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 3px; }
+
+/* ═══════════════════════════════════════════════
+   CODE INLINE
+═══════════════════════════════════════════════ */
+code {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11.5px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 1px 6px;
+  color: var(--text2);
+}
+
+/* ═══════════════════════════════════════════════
+   MOBILE
+═══════════════════════════════════════════════ */
+@media (max-width: 640px) {
+  .main { padding: 1rem; }
+  .metric-value { font-size: 22px; }
+  .roi-label { min-width: 100px; font-size: 11px; }
+  .section-hero { flex-direction: column; align-items: flex-start; }
+  .header-badge { display: none; }
+}
+
+/* ═══════════════════════════════════════════════
+   DIVIDER
+═══════════════════════════════════════════════ */
+.divider { height: 1px; background: var(--border); margin: 1rem 0; }
 </style>
 </head>
 <body>
 
-<!-- HEADER -->
+<!-- ══════════════ HEADER ══════════════ -->
 <header class="site-header">
   <div class="header-inner">
-    <div class="logo-area">
-      <div class="logo-badge">zepto</div>
+    <div class="logo-group">
+      <div class="logo-pill">zepto</div>
       <div>
-        <div class="header-title">Web Analytics — Final Project</div>
-        <div class="header-meta">Raja Kumar · 24MCA20229 · MCA-2(B) · 24CAP-752</div>
+        <div style="font-size:13px;font-weight:500;color:rgba(255,255,255,0.85);">Web Analytics Dashboard</div>
+        <div class="header-tagline"><strong>Raja Kumar</strong> · 24MCA20229 · MCA-2(B)</div>
       </div>
     </div>
-    <div style="text-align:right;">
-      <div class="header-meta" style="color:rgba(255,255,255,0.8);">University Institute of Computing</div>
-      <div class="header-meta">Chandigarh University</div>
+    <div class="header-right">
+      <div class="header-badge">24CAP-752</div>
+      <span class="theme-label" id="themeLabel">LIGHT</span>
+      <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()" title="Toggle dark/light mode"></button>
     </div>
   </div>
 </header>
 
-<!-- NAV -->
+<!-- ══════════════ NAV ══════════════ -->
 <nav class="nav-bar">
   <div class="nav-inner">
-    <button class="nav-btn active" onclick="showSection('overview', this)">📊 Traffic Overview</button>
-    <button class="nav-btn" onclick="showSection('seo', this)">🔍 SEO Analysis</button>
-    <button class="nav-btn" onclick="showSection('campaigns', this)">📣 Ad Campaigns</button>
-    <button class="nav-btn" onclick="showSection('roi', this)">💰 ROI Calculator</button>
-    <button class="nav-btn" onclick="showSection('recommendations', this)">🚀 Recommendations</button>
+    <button class="nav-btn active" onclick="showSection('overview',this)"><span class="nav-icon">📊</span>Traffic Overview</button>
+    <button class="nav-btn" onclick="showSection('seo',this)"><span class="nav-icon">🔍</span>SEO Analysis</button>
+    <button class="nav-btn" onclick="showSection('campaigns',this)"><span class="nav-icon">📣</span>Ad Campaigns</button>
+    <button class="nav-btn" onclick="showSection('roi',this)"><span class="nav-icon">💰</span>ROI Calculator</button>
+    <button class="nav-btn" onclick="showSection('recommendations',this)"><span class="nav-icon">🚀</span>Recommendations</button>
   </div>
 </nav>
 
-<!-- MAIN -->
+<!-- ══════════════ MAIN ══════════════ -->
 <main class="main">
 
-  <!-- ══════════ SECTION 1: OVERVIEW ══════════ -->
-  <div id="overview" class="section active">
-    <div class="section-intro">
-      <div class="section-icon red">📊</div>
-      <div class="section-intro-text">
-        <h2>Traffic Overview — Zepto.com</h2>
-        <p>Monthly session data, channel breakdown, conversion funnel &amp; top landing pages</p>
+<!-- ══════════ SECTION 1: OVERVIEW ══════════ -->
+<div id="overview" class="section active">
+
+  <div class="section-hero">
+    <div class="section-hero-left">
+      <div class="hero-icon">📊</div>
+      <div>
+        <div class="hero-title">Traffic Overview — zepto.com</div>
+        <div class="hero-sub">Monthly sessions · Channel breakdown · Conversion funnel · Top landing pages</div>
       </div>
     </div>
+    <div class="hero-chip">LIVE DATA</div>
+  </div>
 
-    <div class="grid-4">
-      <div class="metric-card accent-red">
-        <div class="metric-label">Monthly Visitors</div>
-        <div class="metric-value">18.4M</div>
-        <div class="metric-change up">▲ +12.3% MoM</div>
-      </div>
-      <div class="metric-card accent-blue">
-        <div class="metric-label">Avg Session Duration</div>
-        <div class="metric-value">4:32</div>
-        <div class="metric-change up">▲ +8.1% MoM</div>
-      </div>
-      <div class="metric-card accent-green">
-        <div class="metric-label">Bounce Rate</div>
-        <div class="metric-value">38.2%</div>
-        <div class="metric-change down-good">✓ Below 40% (Good)</div>
-      </div>
-      <div class="metric-card accent-amber">
-        <div class="metric-label">Pages / Session</div>
-        <div class="metric-value">6.8</div>
-        <div class="metric-change up">▲ +5.2% MoM</div>
-      </div>
+  <div class="grid-4">
+    <div class="metric-card red">
+      <div class="metric-label">Monthly Visitors</div>
+      <div class="metric-value">18.4M</div>
+      <div class="metric-sub up">▲ +12.3% MoM</div>
     </div>
+    <div class="metric-card blue">
+      <div class="metric-label">Avg Session Duration</div>
+      <div class="metric-value">4:32</div>
+      <div class="metric-sub up">▲ +8.1% MoM</div>
+    </div>
+    <div class="metric-card green">
+      <div class="metric-label">Bounce Rate</div>
+      <div class="metric-value">38.2%</div>
+      <div class="metric-sub ok">✓ Below 40% target</div>
+    </div>
+    <div class="metric-card amber">
+      <div class="metric-label">Pages / Session</div>
+      <div class="metric-value">6.8</div>
+      <div class="metric-sub up">▲ +5.2% MoM</div>
+    </div>
+  </div>
 
-    <div class="grid-2">
-      <div class="card">
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-header">
         <div class="card-title">Traffic by Channel</div>
-        <div class="channel-bar"><div class="channel-name">Direct</div><div class="channel-fill" style="width:70%;background:#c0392b;">Direct</div><div class="channel-pct">68%</div></div>
-        <div class="channel-bar"><div class="channel-name">Organic Search</div><div class="channel-fill" style="width:55%;background:#2980b9;">Organic</div><div class="channel-pct">14%</div></div>
-        <div class="channel-bar"><div class="channel-name">Paid Ads</div><div class="channel-fill" style="width:40%;background:#27ae60;">Paid</div><div class="channel-pct">10%</div></div>
-        <div class="channel-bar"><div class="channel-name">Social Media</div><div class="channel-fill" style="width:27%;background:#8e44ad;">Social</div><div class="channel-pct">7%</div></div>
-        <div class="channel-bar"><div class="channel-name">Referral</div><div class="channel-fill" style="width:14%;background:#e67e22;">Ref</div><div class="channel-pct">3%</div></div>
+        <div class="card-badge live">Last 30 days</div>
       </div>
-      <div class="card">
+      <div class="channel-row"><div class="channel-dot" style="background:#e63327;"></div><div class="channel-name">Direct</div><div class="channel-bar-wrap"><div class="channel-fill" style="width:68%;background:#e63327;"></div></div><div class="channel-pct">68%</div></div>
+      <div class="channel-row"><div class="channel-dot" style="background:#3b82f6;"></div><div class="channel-name">Organic Search</div><div class="channel-bar-wrap"><div class="channel-fill" style="width:48%;background:#3b82f6;"></div></div><div class="channel-pct">14%</div></div>
+      <div class="channel-row"><div class="channel-dot" style="background:#22c55e;"></div><div class="channel-name">Paid Ads</div><div class="channel-bar-wrap"><div class="channel-fill" style="width:34%;background:#22c55e;"></div></div><div class="channel-pct">10%</div></div>
+      <div class="channel-row"><div class="channel-dot" style="background:#a855f7;"></div><div class="channel-name">Social Media</div><div class="channel-bar-wrap"><div class="channel-fill" style="width:24%;background:#a855f7;"></div></div><div class="channel-pct">7%</div></div>
+      <div class="channel-row"><div class="channel-dot" style="background:#f59e0b;"></div><div class="channel-name">Referral</div><div class="channel-bar-wrap"><div class="channel-fill" style="width:10%;background:#f59e0b;"></div></div><div class="channel-pct">3%</div></div>
+    </div>
+    <div class="card">
+      <div class="card-header">
         <div class="card-title">Conversion Funnel</div>
-        <div class="funnel-step"><div class="funnel-label">Site Visitors</div><div class="funnel-bar-wrap"><div class="funnel-bar" style="width:100%;background:#c0392b;">18.4M</div></div><div class="funnel-num">18.4M</div></div>
-        <div class="funnel-step"><div class="funnel-label">Product Views</div><div class="funnel-bar-wrap"><div class="funnel-bar" style="width:80%;background:#e74c3c;">14.7M</div></div><div class="funnel-num">14.7M</div></div>
-        <div class="funnel-step"><div class="funnel-label">Add to Cart</div><div class="funnel-bar-wrap"><div class="funnel-bar" style="width:45%;background:#e67e22;">8.3M</div></div><div class="funnel-num">8.3M</div></div>
-        <div class="funnel-step"><div class="funnel-label">Checkout</div><div class="funnel-bar-wrap"><div class="funnel-bar" style="width:28%;background:#f39c12;">5.1M</div></div><div class="funnel-num">5.1M</div></div>
-        <div class="funnel-step"><div class="funnel-label">Orders Placed</div><div class="funnel-bar-wrap"><div class="funnel-bar" style="width:18%;background:#27ae60;">3.3M</div></div><div class="funnel-num">3.3M</div></div>
+        <div class="card-badge exp">18% final CVR</div>
       </div>
+      <div class="funnel-step"><div class="funnel-label">Site Visitors</div><div class="funnel-bar-wrap"><div class="funnel-bar" style="width:100%;background:#e63327;">18.4M</div></div><div class="funnel-num">18.4M</div></div>
+      <div class="funnel-step"><div class="funnel-label">Product Views</div><div class="funnel-bar-wrap"><div class="funnel-bar" style="width:80%;background:#ef4444;">14.7M</div></div><div class="funnel-num">14.7M</div></div>
+      <div class="funnel-step"><div class="funnel-label">Add to Cart</div><div class="funnel-bar-wrap"><div class="funnel-bar" style="width:45%;background:#f59e0b;">8.3M</div></div><div class="funnel-num">8.3M</div></div>
+      <div class="funnel-step"><div class="funnel-label">Checkout</div><div class="funnel-bar-wrap"><div class="funnel-bar" style="width:28%;background:#f59e0b;">5.1M</div></div><div class="funnel-num">5.1M</div></div>
+      <div class="funnel-step"><div class="funnel-label">Orders Placed</div><div class="funnel-bar-wrap"><div class="funnel-bar" style="width:18%;background:#22c55e;">3.3M</div></div><div class="funnel-num">3.3M</div></div>
     </div>
+  </div>
 
-    <div class="card">
-      <div class="card-title">Monthly Traffic Trend (Sessions in Millions)</div>
-      <div class="chart-wrap" style="height:220px;">
-        <canvas id="trafficChart"></canvas>
-      </div>
-    </div>
+  <div class="card">
+    <div class="card-header"><div class="card-title">Monthly Traffic Trend (Sessions in Millions)</div><div class="card-badge live">Oct 2025 – Mar 2026</div></div>
+    <div class="chart-wrap" style="height:230px;"><canvas id="trafficChart"></canvas></div>
+  </div>
 
-    <div class="card">
-      <div class="card-title">Top Landing Pages</div>
+  <div class="card">
+    <div class="card-header"><div class="card-title">Top Landing Pages</div></div>
+    <div class="table-wrap">
       <table class="table">
-        <thead><tr><th>Page URL</th><th>Sessions</th><th>Avg Time on Page</th><th>Bounce Rate</th><th>CVR</th></tr></thead>
+        <thead><tr><th>Page URL</th><th>Sessions</th><th>Avg Time</th><th>Bounce Rate</th><th>CVR</th></tr></thead>
         <tbody>
-          <tr><td><code style="font-family:'JetBrains Mono',monospace;font-size:12px;">/</code> (Home)</td><td>4,820,000</td><td>3:12</td><td>32%</td><td><span class="badge badge-success">5.8%</span></td></tr>
-          <tr><td><code style="font-family:'JetBrains Mono',monospace;font-size:12px;">/grocery</code></td><td>3,140,000</td><td>5:44</td><td>28%</td><td><span class="badge badge-success">8.2%</span></td></tr>
-          <tr><td><code style="font-family:'JetBrains Mono',monospace;font-size:12px;">/fruits-vegetables</code></td><td>2,210,000</td><td>4:58</td><td>34%</td><td><span class="badge badge-success">7.1%</span></td></tr>
-          <tr><td><code style="font-family:'JetBrains Mono',monospace;font-size:12px;">/snacks</code></td><td>1,870,000</td><td>3:40</td><td>41%</td><td><span class="badge badge-warn">4.3%</span></td></tr>
-          <tr><td><code style="font-family:'JetBrains Mono',monospace;font-size:12px;">/offers</code></td><td>1,650,000</td><td>2:55</td><td>48%</td><td><span class="badge badge-warn">3.9%</span></td></tr>
+          <tr><td><code>/</code> Home</td><td>4,820,000</td><td>3:12</td><td>32%</td><td><span class="badge badge-success">5.8%</span></td></tr>
+          <tr><td><code>/grocery</code></td><td>3,140,000</td><td>5:44</td><td>28%</td><td><span class="badge badge-success">8.2%</span></td></tr>
+          <tr><td><code>/fruits-vegetables</code></td><td>2,210,000</td><td>4:58</td><td>34%</td><td><span class="badge badge-success">7.1%</span></td></tr>
+          <tr><td><code>/snacks</code></td><td>1,870,000</td><td>3:40</td><td>41%</td><td><span class="badge badge-warn">4.3%</span></td></tr>
+          <tr><td><code>/offers</code></td><td>1,650,000</td><td>2:55</td><td>48%</td><td><span class="badge badge-warn">3.9%</span></td></tr>
         </tbody>
       </table>
     </div>
   </div>
+</div>
 
-  <!-- ══════════ SECTION 2: SEO ══════════ -->
-  <div id="seo" class="section">
-    <div class="section-intro">
-      <div class="section-icon red">🔍</div>
-      <div class="section-intro-text">
-        <h2>SEO Analysis — Domain & Page Authority</h2>
-        <p>On-page SEO (Exp 3), keyword rankings, backlink profile &amp; Google Search Console insights</p>
+<!-- ══════════ SECTION 2: SEO ══════════ -->
+<div id="seo" class="section">
+
+  <div class="section-hero">
+    <div class="section-hero-left">
+      <div class="hero-icon">🔍</div>
+      <div>
+        <div class="hero-title">SEO Analysis — Domain & Page Authority</div>
+        <div class="hero-sub">On-Page SEO (Exp 3) · Keyword rankings · Backlink profile · Google Search Console</div>
       </div>
     </div>
+    <div class="hero-chip">EXP 2 + EXP 3</div>
+  </div>
 
-    <div class="grid-4">
-      <div class="metric-card accent-red">
-        <div class="metric-label">Domain Authority</div>
-        <div class="metric-value">72/100</div>
-        <div class="metric-change up">▲ Strong</div>
-      </div>
-      <div class="metric-card accent-blue">
-        <div class="metric-label">Page Authority</div>
-        <div class="metric-value">64/100</div>
-        <div class="metric-change up">▲ Good</div>
-      </div>
-      <div class="metric-card accent-green">
-        <div class="metric-label">Total Backlinks</div>
-        <div class="metric-value">48,200</div>
-        <div class="metric-change up">▲ +6.4% MoM</div>
-      </div>
-      <div class="metric-card accent-amber">
-        <div class="metric-label">Referring Domains</div>
-        <div class="metric-value">3,140</div>
-        <div class="metric-change up">▲ Healthy</div>
-      </div>
-    </div>
+  <div class="grid-4">
+    <div class="metric-card red"><div class="metric-label">Domain Authority</div><div class="metric-value">72/100</div><div class="metric-sub up">▲ Strong</div></div>
+    <div class="metric-card blue"><div class="metric-label">Page Authority</div><div class="metric-value">64/100</div><div class="metric-sub up">▲ Good</div></div>
+    <div class="metric-card green"><div class="metric-label">Total Backlinks</div><div class="metric-value">48.2K</div><div class="metric-sub up">▲ +6.4% MoM</div></div>
+    <div class="metric-card amber"><div class="metric-label">Referring Domains</div><div class="metric-value">3,140</div><div class="metric-sub up">▲ Healthy</div></div>
+  </div>
 
-    <div class="grid-2">
-      <div class="card">
-        <div class="card-title">Keyword Rankings</div>
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-header"><div class="card-title">Keyword Rankings</div><div class="card-badge live">Google India</div></div>
+      <div class="table-wrap">
         <table class="table">
           <thead><tr><th>Keyword</th><th>Rank</th><th>Volume/mo</th><th>Difficulty</th></tr></thead>
           <tbody>
-            <tr><td>grocery delivery app</td><td><span class="badge badge-success">#2</span></td><td>201K</td><td>High</td></tr>
-            <tr><td>zepto delivery</td><td><span class="badge badge-success">#1</span></td><td>165K</td><td>Low</td></tr>
-            <tr><td>10 minute delivery india</td><td><span class="badge badge-success">#3</span></td><td>90K</td><td>Medium</td></tr>
-            <tr><td>instant grocery delivery</td><td><span class="badge badge-warn">#8</span></td><td>74K</td><td>High</td></tr>
-            <tr><td>online vegetables delivery</td><td><span class="badge badge-warn">#11</span></td><td>60K</td><td>Medium</td></tr>
+            <tr><td>grocery delivery app</td><td><span class="badge badge-success">#2</span></td><td>201K</td><td><span class="badge badge-danger">High</span></td></tr>
+            <tr><td>zepto delivery</td><td><span class="badge badge-success">#1</span></td><td>165K</td><td><span class="badge badge-success">Low</span></td></tr>
+            <tr><td>10 minute delivery india</td><td><span class="badge badge-success">#3</span></td><td>90K</td><td><span class="badge badge-warn">Medium</span></td></tr>
+            <tr><td>instant grocery delivery</td><td><span class="badge badge-warn">#8</span></td><td>74K</td><td><span class="badge badge-danger">High</span></td></tr>
+            <tr><td>online vegetables delivery</td><td><span class="badge badge-warn">#11</span></td><td>60K</td><td><span class="badge badge-warn">Medium</span></td></tr>
           </tbody>
         </table>
       </div>
-      <div class="card">
-        <div class="card-title">On-Page SEO Health Score</div>
-        <div class="progress-row"><div class="progress-head"><span>Title Tags</span><span style="color:#27ae60;font-weight:500;">98%</span></div><div class="progress-bar"><div class="progress-fill" style="width:98%;background:#27ae60;"></div></div></div>
-        <div class="progress-row"><div class="progress-head"><span>Meta Descriptions</span><span style="color:#27ae60;font-weight:500;">95%</span></div><div class="progress-bar"><div class="progress-fill" style="width:95%;background:#27ae60;"></div></div></div>
-        <div class="progress-row"><div class="progress-head"><span>Core Web Vitals</span><span style="color:#f39c12;font-weight:500;">76%</span></div><div class="progress-bar"><div class="progress-fill" style="width:76%;background:#f39c12;"></div></div></div>
-        <div class="progress-row"><div class="progress-head"><span>Mobile Friendly</span><span style="color:#27ae60;font-weight:500;">100%</span></div><div class="progress-bar"><div class="progress-fill" style="width:100%;background:#27ae60;"></div></div></div>
-        <div class="progress-row"><div class="progress-head"><span>Page Speed (Mobile)</span><span style="color:#c0392b;font-weight:500;">62%</span></div><div class="progress-bar"><div class="progress-fill" style="width:62%;background:#c0392b;"></div></div></div>
-        <div class="progress-row"><div class="progress-head"><span>Schema Markup</span><span style="color:#27ae60;font-weight:500;">88%</span></div><div class="progress-bar"><div class="progress-fill" style="width:88%;background:#27ae60;"></div></div></div>
-        <div class="progress-row"><div class="progress-head"><span>Open Graph Tags</span><span style="color:#27ae60;font-weight:500;">92%</span></div><div class="progress-bar"><div class="progress-fill" style="width:92%;background:#27ae60;"></div></div></div>
-      </div>
     </div>
-
     <div class="card">
-      <div class="card-title">Backlink Growth — New vs Lost (6 Months)</div>
-      <div class="chart-wrap" style="height:220px;">
-        <canvas id="backlinkChart"></canvas>
-      </div>
+      <div class="card-header"><div class="card-title">On-Page SEO Health Score</div><div class="card-badge exp">Wix Dashboard</div></div>
+      <div class="progress-row"><div class="progress-head"><span class="progress-key">Title Tags</span><span class="progress-val" style="color:#22c55e;">98%</span></div><div class="progress-bar"><div class="progress-fill" style="width:98%;background:#22c55e;"></div></div></div>
+      <div class="progress-row"><div class="progress-head"><span class="progress-key">Meta Descriptions</span><span class="progress-val" style="color:#22c55e;">95%</span></div><div class="progress-bar"><div class="progress-fill" style="width:95%;background:#22c55e;"></div></div></div>
+      <div class="progress-row"><div class="progress-head"><span class="progress-key">Core Web Vitals</span><span class="progress-val" style="color:#f59e0b;">76%</span></div><div class="progress-bar"><div class="progress-fill" style="width:76%;background:#f59e0b;"></div></div></div>
+      <div class="progress-row"><div class="progress-head"><span class="progress-key">Mobile Friendly</span><span class="progress-val" style="color:#22c55e;">100%</span></div><div class="progress-bar"><div class="progress-fill" style="width:100%;background:#22c55e;"></div></div></div>
+      <div class="progress-row"><div class="progress-head"><span class="progress-key">Page Speed (Mobile)</span><span class="progress-val" style="color:#e63327;">62%</span></div><div class="progress-bar"><div class="progress-fill" style="width:62%;background:#e63327;"></div></div></div>
+      <div class="progress-row"><div class="progress-head"><span class="progress-key">Schema Markup</span><span class="progress-val" style="color:#22c55e;">88%</span></div><div class="progress-bar"><div class="progress-fill" style="width:88%;background:#22c55e;"></div></div></div>
+      <div class="progress-row"><div class="progress-head"><span class="progress-key">Open Graph Tags</span><span class="progress-val" style="color:#22c55e;">92%</span></div><div class="progress-bar"><div class="progress-fill" style="width:92%;background:#22c55e;"></div></div></div>
     </div>
+  </div>
 
-    <div class="card">
-      <div class="card-title">Off-Page SEO — Backlink Sources (Exp 3)</div>
+  <div class="card">
+    <div class="card-header"><div class="card-title">Backlink Growth — New vs Lost (6 Months)</div><div class="card-badge live">Oct 2025 – Mar 2026</div></div>
+    <div class="chart-wrap" style="height:220px;"><canvas id="backlinkChart"></canvas></div>
+  </div>
+
+  <div class="card">
+    <div class="card-header"><div class="card-title">Off-Page SEO — Backlink Sources (Exp 3)</div><div class="card-badge exp">LinkedIn + Twitter</div></div>
+    <div class="table-wrap">
       <table class="table">
-        <thead><tr><th>Platform</th><th>Type</th><th>Backlinks</th><th>DA of Source</th><th>Status</th></tr></thead>
+        <thead><tr><th>Platform</th><th>Type</th><th>Backlinks</th><th>Source DA</th><th>Status</th></tr></thead>
         <tbody>
           <tr><td>LinkedIn Profile</td><td>Social Profile</td><td>1</td><td>98</td><td><span class="badge badge-success">Active</span></td></tr>
           <tr><td>X (Twitter) Post</td><td>Social Share</td><td>1</td><td>94</td><td><span class="badge badge-success">Active</span></td></tr>
           <tr><td>GitHub Profile</td><td>Dev Platform</td><td>1</td><td>96</td><td><span class="badge badge-success">Active</span></td></tr>
           <tr><td>Tech Blogs</td><td>Editorial</td><td>240</td><td>45–70</td><td><span class="badge badge-success">Active</span></td></tr>
-          <tr><td>News Articles</td><td>Press</td><td>1,800</td><td>60–90</td><td><span class="badge badge-success">Active</span></td></tr>
+          <tr><td>News Articles</td><td>Press / Media</td><td>1,800</td><td>60–90</td><td><span class="badge badge-success">Active</span></td></tr>
         </tbody>
       </table>
     </div>
   </div>
+</div>
 
-  <!-- ══════════ SECTION 3: CAMPAIGNS ══════════ -->
-  <div id="campaigns" class="section">
-    <div class="section-intro">
-      <div class="section-icon red">📣</div>
-      <div class="section-intro-text">
-        <h2>Ad Campaign Performance</h2>
-        <p>Facebook Ads (Exp 4) · Google AdSense (Exp 5) · Google Display + SendPulse (Exp 6)</p>
+<!-- ══════════ SECTION 3: CAMPAIGNS ══════════ -->
+<div id="campaigns" class="section">
+
+  <div class="section-hero">
+    <div class="section-hero-left">
+      <div class="hero-icon">📣</div>
+      <div>
+        <div class="hero-title">Ad Campaign Performance</div>
+        <div class="hero-sub">Facebook Ads (Exp 4) · Google AdSense (Exp 5) · Google Display + SendPulse (Exp 6)</div>
       </div>
     </div>
+    <div class="hero-chip">EXP 4 + 5 + 6</div>
+  </div>
 
-    <div class="grid-4">
-      <div class="metric-card accent-red">
-        <div class="metric-label">Click-Through Rate (CTR)</div>
-        <div class="metric-value">4.82%</div>
-        <div class="metric-change up">▲ Excellent (> 2% benchmark)</div>
-      </div>
-      <div class="metric-card accent-blue">
-        <div class="metric-label">Cost Per Click (CPC)</div>
-        <div class="metric-value">₹12.40</div>
-        <div class="metric-change down-good">✓ Low (Efficient)</div>
-      </div>
-      <div class="metric-card accent-green">
-        <div class="metric-label">Customer Acq. Cost (CAC)</div>
-        <div class="metric-value">₹186</div>
-        <div class="metric-change up">▲ Improving MoM</div>
-      </div>
-      <div class="metric-card accent-amber">
-        <div class="metric-label">Return on Ad Spend (ROAS)</div>
-        <div class="metric-value">3.8x</div>
-        <div class="metric-change up">▲ Profitable</div>
-      </div>
-    </div>
+  <div class="grid-4">
+    <div class="metric-card red"><div class="metric-label">Click-Through Rate (CTR)</div><div class="metric-value">4.82%</div><div class="metric-sub up">▲ Excellent (&gt;2% benchmark)</div></div>
+    <div class="metric-card blue"><div class="metric-label">Cost Per Click (CPC)</div><div class="metric-value">₹12.40</div><div class="metric-sub ok">✓ Efficient (low)</div></div>
+    <div class="metric-card green"><div class="metric-label">Customer Acq. Cost (CAC)</div><div class="metric-value">₹186</div><div class="metric-sub up">▲ Improving MoM</div></div>
+    <div class="metric-card amber"><div class="metric-label">Return on Ad Spend</div><div class="metric-value">3.8x</div><div class="metric-sub up">▲ Profitable</div></div>
+  </div>
 
+  <div class="card">
+    <div class="card-header"><div class="card-title">Campaign CTR vs CVR — Channel Comparison</div><div class="card-badge live">All campaigns</div></div>
+    <div class="chart-wrap" style="height:260px;"><canvas id="campaignChart"></canvas></div>
+  </div>
+
+  <div class="grid-2">
     <div class="card">
-      <div class="card-title">Campaign CTR vs CVR Comparison</div>
-      <div class="chart-wrap" style="height:260px;">
-        <canvas id="campaignChart"></canvas>
-      </div>
-    </div>
-
-    <div class="grid-2">
-      <div class="card">
-        <div class="card-title">Experiment 4 — Facebook Ads Manager</div>
+      <div class="card-header"><div class="card-title">Experiment 4 — Facebook Ads Manager</div><div class="card-badge exp">02/03/2026</div></div>
+      <div class="table-wrap">
         <table class="table">
           <thead><tr><th>Setting / Metric</th><th>Value</th></tr></thead>
           <tbody>
             <tr><td>Campaign Objective</td><td>Traffic</td></tr>
-            <tr><td>Campaign Name</td><td>Portfolio_Traffic_Campaign</td></tr>
+            <tr><td>Campaign Name</td><td><code>Portfolio_Traffic_Campaign</code></td></tr>
             <tr><td>Daily Budget</td><td>₹200 / day</td></tr>
             <tr><td>Target Location</td><td>India</td></tr>
-            <tr><td>Target Age</td><td>18–35</td></tr>
+            <tr><td>Target Age</td><td>18 – 35</td></tr>
             <tr><td>Interests</td><td>Web Dev, ReactJS, Programming</td></tr>
             <tr><td>Placements</td><td>Advantage+ (FB + Instagram)</td></tr>
-            <tr><td>Ad Format</td><td>Single Image</td></tr>
             <tr><td>CTR Achieved</td><td><span class="badge badge-success">4.2%</span></td></tr>
             <tr><td>CPC</td><td>₹11.80</td></tr>
             <tr><td>CAC</td><td>₹174</td></tr>
           </tbody>
         </table>
       </div>
-      <div class="card">
-        <div class="card-title">Experiment 6 — Google Display + SendPulse Push</div>
+    </div>
+    <div class="card">
+      <div class="card-header"><div class="card-title">Experiment 6 — Google Display + SendPulse</div><div class="card-badge exp">06/04/2026</div></div>
+      <div class="table-wrap">
         <table class="table">
           <thead><tr><th>Setting / Metric</th><th>Value</th></tr></thead>
           <tbody>
@@ -527,310 +892,332 @@
         </table>
       </div>
     </div>
+  </div>
 
+  <div class="card">
+    <div class="card-header"><div class="card-title">Key Advertising Metric Formulas</div></div>
+    <div class="formula-grid">
+      <div class="formula-card"><div class="formula-name">CTR</div><div class="formula-eq">CTR = (Clicks / Impressions) × 100</div><div class="formula-res">11,568 / 2,40,000 × 100 = 4.82%</div></div>
+      <div class="formula-card"><div class="formula-name">CPC</div><div class="formula-eq">CPC = Total Spend / Total Clicks</div><div class="formula-res">₹1,43,443 / 11,568 = ₹12.40</div></div>
+      <div class="formula-card"><div class="formula-name">CAC</div><div class="formula-eq">CAC = Total Spend / New Customers</div><div class="formula-res">₹1,43,443 / 770 = ₹186</div></div>
+      <div class="formula-card"><div class="formula-name">ROAS</div><div class="formula-eq">ROAS = Revenue / Ad Spend</div><div class="formula-res">₹5,45,000 / ₹1,43,443 = 3.8x</div></div>
+      <div class="formula-card"><div class="formula-name">ROI</div><div class="formula-eq">ROI = (Revenue − Cost) / Cost × 100</div><div class="formula-res">(5,45,000 − 1,43,443) / 1,43,443 = 280%</div></div>
+      <div class="formula-card"><div class="formula-name">CVR</div><div class="formula-eq">CVR = (Conversions / Clicks) × 100</div><div class="formula-res">1,408 / 11,568 × 100 = 12.17%</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════ SECTION 4: ROI ══════════ -->
+<div id="roi" class="section">
+
+  <div class="section-hero">
+    <div class="section-hero-left">
+      <div class="hero-icon">💰</div>
+      <div>
+        <div class="hero-title">ROI Calculator — Live Campaign Simulator</div>
+        <div class="hero-sub">Drag sliders to simulate Zepto ad campaign performance and compute ROI instantly</div>
+      </div>
+    </div>
+    <div class="hero-chip">INTERACTIVE</div>
+  </div>
+
+  <div class="grid-2" style="align-items:start;">
     <div class="card">
-      <div class="card-title">Key Advertising Metric Formulas</div>
-      <div class="formula-grid">
-        <div class="formula-card">
-          <div class="formula-name">CTR Formula</div>
-          <div class="formula-eq">CTR = (Clicks / Impressions) × 100</div>
-          <div class="formula-result">11,568 / 2,40,000 × 100 = 4.82%</div>
-        </div>
-        <div class="formula-card">
-          <div class="formula-name">CPC Formula</div>
-          <div class="formula-eq">CPC = Total Spend / Total Clicks</div>
-          <div class="formula-result">₹1,43,443 / 11,568 = ₹12.40</div>
-        </div>
-        <div class="formula-card">
-          <div class="formula-name">CAC Formula</div>
-          <div class="formula-eq">CAC = Total Spend / New Customers</div>
-          <div class="formula-result">₹1,43,443 / 770 = ₹186</div>
-        </div>
-        <div class="formula-card">
-          <div class="formula-name">ROAS Formula</div>
-          <div class="formula-eq">ROAS = Revenue / Ad Spend</div>
-          <div class="formula-result">₹5,45,000 / ₹1,43,443 = 3.8x</div>
-        </div>
-        <div class="formula-card">
-          <div class="formula-name">ROI Formula</div>
-          <div class="formula-eq">ROI = (Revenue - Cost) / Cost × 100</div>
-          <div class="formula-result">(5,45,000 - 1,43,443) / 1,43,443 = 280%</div>
-        </div>
-        <div class="formula-card">
-          <div class="formula-name">CVR Formula</div>
-          <div class="formula-eq">CVR = (Conversions / Clicks) × 100</div>
-          <div class="formula-result">1,408 / 11,568 × 100 = 12.17%</div>
-        </div>
+      <div class="card-header"><div class="card-title">Input Parameters</div></div>
+      <div class="roi-panel">
+        <div class="roi-row"><div class="roi-label">Monthly Ad Budget</div><input type="range" id="budget" min="10000" max="500000" value="100000" step="1000" oninput="calcROI()"><div class="roi-val" id="budgetVal">₹1,00,000</div></div>
+        <div class="roi-row"><div class="roi-label">CTR (%)</div><input type="range" id="ctr" min="0.5" max="10" value="4.82" step="0.1" oninput="calcROI()"><div class="roi-val" id="ctrVal">4.8%</div></div>
+        <div class="roi-row"><div class="roi-label">Cost Per Click — CPC</div><input type="range" id="cpc" min="5" max="50" value="12" step="1" oninput="calcROI()"><div class="roi-val" id="cpcVal">₹12</div></div>
+        <div class="roi-row"><div class="roi-label">Avg Order Value — AOV</div><input type="range" id="aov" min="200" max="2000" value="650" step="50" oninput="calcROI()"><div class="roi-val" id="aovVal">₹650</div></div>
+        <div class="roi-row"><div class="roi-label">Conversion Rate</div><input type="range" id="cvr" min="0.5" max="15" value="5.5" step="0.5" oninput="calcROI()"><div class="roi-val" id="cvrVal">5.5%</div></div>
+      </div>
+    </div>
+    <div>
+      <div class="roi-big">
+        <div class="roi-big-label">Return on Investment</div>
+        <div class="roi-big-value" id="r-roi">—</div>
+        <div class="roi-big-sub">Net profit as % of ad spend</div>
+      </div>
+      <div class="grid-2" style="margin-bottom:0;">
+        <div class="metric-card blue"><div class="metric-label">Total Clicks</div><div class="metric-value" id="r-clicks">—</div></div>
+        <div class="metric-card amber"><div class="metric-label">Orders</div><div class="metric-value" id="r-orders">—</div></div>
+        <div class="metric-card green"><div class="metric-label">Revenue</div><div class="metric-value" id="r-revenue">—</div></div>
+        <div class="metric-card red"><div class="metric-label">Net Profit</div><div class="metric-value" id="r-profit">—</div></div>
+        <div class="metric-card purple"><div class="metric-label">CAC (₹)</div><div class="metric-value" id="r-cac">—</div></div>
+        <div class="metric-card green"><div class="metric-label">ROAS</div><div class="metric-value" id="r-roas">—</div></div>
       </div>
     </div>
   </div>
 
-  <!-- ══════════ SECTION 4: ROI CALCULATOR ══════════ -->
-  <div id="roi" class="section">
-    <div class="section-intro">
-      <div class="section-icon red">💰</div>
-      <div class="section-intro-text">
-        <h2>ROI Calculator — Campaign Simulator</h2>
-        <p>Adjust sliders to simulate Zepto ad campaign performance and compute ROI in real time</p>
+  <div class="card">
+    <div class="card-header"><div class="card-title">ROI vs Budget Curve (live update)</div></div>
+    <div class="chart-wrap" style="height:220px;"><canvas id="roiChart"></canvas></div>
+  </div>
+</div>
+
+<!-- ══════════ SECTION 5: RECOMMENDATIONS ══════════ -->
+<div id="recommendations" class="section">
+
+  <div class="section-hero">
+    <div class="section-hero-left">
+      <div class="hero-icon">🚀</div>
+      <div>
+        <div class="hero-title">Recommendations — Growth Strategy</div>
+        <div class="hero-sub">SEO improvements · Campaign optimizations · Popularity actions · Experiment map</div>
       </div>
     </div>
+    <div class="hero-chip">ACTION PLAN</div>
+  </div>
 
+  <div class="grid-2">
     <div class="card">
-      <div class="card-title">Input Parameters</div>
-      <div class="roi-section">
-        <div class="roi-row"><div class="roi-label">Monthly Ad Budget (₹)</div><input type="range" id="budget" min="10000" max="500000" value="100000" step="1000" oninput="calcROI()"><div class="roi-val" id="budgetVal">₹1,00,000</div></div>
-        <div class="roi-row"><div class="roi-label">Click-Through Rate (%)</div><input type="range" id="ctr" min="0.5" max="10" value="4.82" step="0.1" oninput="calcROI()"><div class="roi-val" id="ctrVal">4.8%</div></div>
-        <div class="roi-row"><div class="roi-label">Cost Per Click — CPC (₹)</div><input type="range" id="cpc" min="5" max="50" value="12" step="1" oninput="calcROI()"><div class="roi-val" id="cpcVal">₹12</div></div>
-        <div class="roi-row"><div class="roi-label">Avg Order Value — AOV (₹)</div><input type="range" id="aov" min="200" max="2000" value="650" step="50" oninput="calcROI()"><div class="roi-val" id="aovVal">₹650</div></div>
-        <div class="roi-row"><div class="roi-label">Conversion Rate (%)</div><input type="range" id="cvr" min="0.5" max="15" value="5.5" step="0.5" oninput="calcROI()"><div class="roi-val" id="cvrVal">5.5%</div></div>
-      </div>
+      <div class="card-header"><div class="card-title">SEO Improvements</div></div>
+      <div class="insight-row"><div class="insight-dot" style="background:var(--accent);"></div><div class="insight-text"><strong>Mobile page speed</strong> is at 62% — target 90%+ using lazy loading, WebP images, and CDN. Reduces bounce rate by ~15%.</div></div>
+      <div class="insight-row"><div class="insight-dot" style="background:var(--accent);"></div><div class="insight-text">Target <strong>long-tail keywords</strong> like "10 minute grocery delivery Bangalore" — lower competition, higher buyer intent and conversion.</div></div>
+      <div class="insight-row"><div class="insight-dot" style="background:var(--accent);"></div><div class="insight-text">Add <strong>FAQ schema markup</strong> on product pages to capture Google rich snippets — increases organic CTR by 20–30%.</div></div>
+      <div class="insight-row"><div class="insight-dot" style="background:var(--accent);"></div><div class="insight-text">Build backlinks via <strong>guest posts</strong> on food blogs and tech sites to push DA from 72 → 80+.</div></div>
     </div>
-
-    <div class="grid-4" id="roiMetrics">
-      <div class="metric-card accent-blue"><div class="metric-label">Total Clicks</div><div class="metric-value" id="r-clicks">—</div></div>
-      <div class="metric-card accent-amber"><div class="metric-label">Orders Generated</div><div class="metric-value" id="r-orders">—</div></div>
-      <div class="metric-card accent-green"><div class="metric-label">Revenue</div><div class="metric-value" id="r-revenue">—</div></div>
-      <div class="metric-card accent-red"><div class="metric-label">Net Profit</div><div class="metric-value" id="r-profit">—</div></div>
-    </div>
-    <div class="grid-3">
-      <div class="metric-card accent-red"><div class="metric-label">ROI %</div><div class="metric-value" id="r-roi" style="color:var(--red);">—</div></div>
-      <div class="metric-card accent-blue"><div class="metric-label">CAC (₹)</div><div class="metric-value" id="r-cac">—</div></div>
-      <div class="metric-card accent-green"><div class="metric-label">ROAS</div><div class="metric-value" id="r-roas">—</div></div>
-    </div>
-
     <div class="card">
-      <div class="card-title">ROI vs Budget Curve</div>
-      <div class="chart-wrap" style="height:220px;">
-        <canvas id="roiChart"></canvas>
-      </div>
+      <div class="card-header"><div class="card-title">Campaign Optimizations</div></div>
+      <div class="insight-row"><div class="insight-dot" style="background:var(--blue);"></div><div class="insight-text">Implement <strong>retargeting</strong> for cart abandoners (48% drop-off). Estimated 20–30% cart recovery using Facebook pixel + Google remarketing.</div></div>
+      <div class="insight-row"><div class="insight-dot" style="background:var(--blue);"></div><div class="insight-text">Use <strong>Lookalike Audiences</strong> from high-LTV customers in Facebook Ads to reduce CAC below ₹150.</div></div>
+      <div class="insight-row"><div class="insight-dot" style="background:var(--blue);"></div><div class="insight-text"><strong>A/B test ad creatives</strong> monthly — rotate images, headlines, CTAs. Ad fatigue cuts CTR by 40% after 2 weeks.</div></div>
+      <div class="insight-row"><div class="insight-dot" style="background:var(--blue);"></div><div class="insight-text">Increase <strong>SendPulse push</strong> frequency at peak hours: 7–9 AM, 12–2 PM, 6–9 PM with personalized product triggers.</div></div>
     </div>
   </div>
 
-  <!-- ══════════ SECTION 5: RECOMMENDATIONS ══════════ -->
-  <div id="recommendations" class="section">
-    <div class="section-intro">
-      <div class="section-icon red">🚀</div>
-      <div class="section-intro-text">
-        <h2>Recommendations — Making Zepto More Popular</h2>
-        <p>SEO improvements, campaign optimizations, and website growth strategies</p>
-      </div>
-    </div>
-
-    <div class="grid-2">
-      <div class="card">
-        <div class="card-title">SEO Improvements</div>
-        <div class="insight-row"><div class="insight-dot" style="background:var(--red);"></div><div class="insight-text"><strong>Mobile page speed</strong> is at 62% — needs to reach 90%+. Use lazy loading, image compression (WebP), and CDN. This alone reduces bounce rate by ~15%.</div></div>
-        <div class="insight-row"><div class="insight-dot" style="background:var(--red);"></div><div class="insight-text">Target <strong>long-tail keywords</strong> like "10 minute grocery delivery Bangalore" — lower competition but very high buyer intent and conversion potential.</div></div>
-        <div class="insight-row"><div class="insight-dot" style="background:var(--red);"></div><div class="insight-text">Add <strong>FAQ schema markup</strong> on product pages to capture Google rich snippets. This increases SERP real estate and organic CTR by 20–30%.</div></div>
-        <div class="insight-row"><div class="insight-dot" style="background:var(--red);"></div><div class="insight-text">Build backlinks through <strong>guest posts</strong> on food blogs, tech review sites, and local business directories to push DA from 72 → 80+.</div></div>
-      </div>
-      <div class="card">
-        <div class="card-title">Campaign Optimizations</div>
-        <div class="insight-row"><div class="insight-dot" style="background:var(--blue);"></div><div class="insight-text">Implement <strong>retargeting campaigns</strong> for cart abandoners (48% checkout drop-off). Estimated 20–30% cart recovery rate using Facebook pixel + Google remarketing.</div></div>
-        <div class="insight-row"><div class="insight-dot" style="background:var(--blue);"></div><div class="insight-text">Use <strong>Lookalike Audiences</strong> in Facebook Ads based on high-LTV customers to reduce CAC below ₹150 while maintaining quality traffic.</div></div>
-        <div class="insight-row"><div class="insight-dot" style="background:var(--blue);"></div><div class="insight-text"><strong>A/B test ad creatives</strong> monthly — rotate images, headlines, and CTAs. Ad fatigue reduces CTR by 40% after 2 weeks of same creative.</div></div>
-        <div class="insight-row"><div class="insight-dot" style="background:var(--blue);"></div><div class="insight-text">Increase <strong>SendPulse push notification</strong> frequency during peak hours: 7–9 AM, 12–2 PM, 6–9 PM. Personalize with product browsing history.</div></div>
-      </div>
-    </div>
-
-    <div class="card">
-      <div class="card-title">Website Popularity — Priority Action Plan</div>
+  <div class="card">
+    <div class="card-header"><div class="card-title">Priority Action Plan — Website Popularity</div></div>
+    <div class="table-wrap">
       <table class="table">
         <thead><tr><th>#</th><th>Action Item</th><th>Expected Impact</th><th>Effort</th><th>Priority</th></tr></thead>
         <tbody>
-          <tr><td>1</td><td>Mobile speed optimization (LCP &lt; 2.5s target)</td><td>Traffic +18%, Bounce −15%</td><td>Medium</td><td><span class="badge badge-danger">Critical</span></td></tr>
-          <tr><td>2</td><td>Google Ads retargeting for cart abandoners</td><td>CVR +25%</td><td>Low</td><td><span class="badge badge-danger">Critical</span></td></tr>
+          <tr><td>1</td><td>Mobile speed optimization (LCP &lt; 2.5s)</td><td>Traffic +18%, Bounce −15%</td><td>Medium</td><td><span class="badge badge-danger">Critical</span></td></tr>
+          <tr><td>2</td><td>Retargeting ads for cart abandoners</td><td>CVR +25%</td><td>Low</td><td><span class="badge badge-danger">Critical</span></td></tr>
           <tr><td>3</td><td>Referral program (user invites)</td><td>CAC −40%</td><td>High</td><td><span class="badge badge-danger">High</span></td></tr>
-          <tr><td>4</td><td>Local SEO for tier-2 cities (Jaipur, Lucknow)</td><td>Organic +30%</td><td>Medium</td><td><span class="badge badge-warn">Medium</span></td></tr>
+          <tr><td>4</td><td>Local SEO for tier-2 cities</td><td>Organic +30%</td><td>Medium</td><td><span class="badge badge-warn">Medium</span></td></tr>
           <tr><td>5</td><td>Google AdSense placement optimization</td><td>Revenue +12%</td><td>Low</td><td><span class="badge badge-warn">Medium</span></td></tr>
-          <tr><td>6</td><td>YouTube pre-roll ads for brand awareness</td><td>DA +8 points</td><td>High</td><td><span class="badge badge-info">Low</span></td></tr>
+          <tr><td>6</td><td>YouTube pre-roll ads for brand awareness</td><td>Brand reach +50%</td><td>High</td><td><span class="badge badge-info">Low</span></td></tr>
           <tr><td>7</td><td>LinkedIn B2B campaign for partnerships</td><td>Backlinks +500</td><td>Medium</td><td><span class="badge badge-info">Low</span></td></tr>
         </tbody>
       </table>
     </div>
+  </div>
 
-    <div class="card">
-      <div class="card-title">All 6 Experiments — Tools & Technologies Used</div>
-      <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:4px;">
-        <span class="tag tag-red">Exp 1 — Wix Portfolio Website</span>
-        <span class="tag tag-blue">Exp 2 — Google Analytics + Search Console</span>
-        <span class="tag tag-green">Exp 3 — On-Page SEO + Backlinks (LinkedIn, X)</span>
-        <span class="tag tag-amber">Exp 4 — Facebook Ads Manager</span>
-        <span class="tag tag-purple">Exp 5 — Google AdSense Integration</span>
-        <span class="tag tag-blue">Exp 6 — Google Display Ads + SendPulse Push</span>
-      </div>
-      <div style="margin-top:1rem;">
-        <div class="card-title" style="border:none;padding:0;margin-bottom:8px;">Subject Details</div>
-        <table class="table">
-          <tbody>
-            <tr><td style="color:var(--text3);width:150px;">Student</td><td>Raja Kumar</td><td style="color:var(--text3);width:130px;">UID</td><td>24MCA20229</td></tr>
-            <tr><td style="color:var(--text3);">Branch</td><td>MCA</td><td style="color:var(--text3);">Section</td><td>MCA-2(B)</td></tr>
-            <tr><td style="color:var(--text3);">Semester</td><td>4th</td><td style="color:var(--text3);">Subject Code</td><td>24CAP-752</td></tr>
-            <tr><td style="color:var(--text3);">Subject</td><td>Web Analytics Lab</td><td style="color:var(--text3);">Teacher</td><td>Prabhjot Kaur</td></tr>
-            <tr><td style="color:var(--text3);">Institute</td><td colspan="3">University Institute of Computing, Chandigarh University</td></tr>
-          </tbody>
-        </table>
-      </div>
+  <div class="card">
+    <div class="card-header"><div class="card-title">All 6 Experiments — Tools & Technologies</div></div>
+    <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:1.2rem;">
+      <span class="tag tag-red">Exp 1 — Wix Portfolio Website</span>
+      <span class="tag tag-blue">Exp 2 — Google Analytics + Search Console</span>
+      <span class="tag tag-green">Exp 3 — On-Page SEO + Backlinks</span>
+      <span class="tag tag-amber">Exp 4 — Facebook Ads Manager</span>
+      <span class="tag tag-purple">Exp 5 — Google AdSense</span>
+      <span class="tag tag-blue">Exp 6 — Google Display + SendPulse</span>
+    </div>
+    <div class="divider"></div>
+    <div class="card-title" style="margin:1rem 0 0.75rem;">Submission Details</div>
+    <div class="info-grid">
+      <div class="info-item"><div class="info-key">Student</div><div class="info-val">Raja Kumar</div></div>
+      <div class="info-item"><div class="info-key">UID</div><div class="info-val" style="font-family:'JetBrains Mono',monospace;">24MCA20229</div></div>
+      <div class="info-item"><div class="info-key">Branch</div><div class="info-val">MCA — 4th Semester</div></div>
+      <div class="info-item"><div class="info-key">Section</div><div class="info-val">MCA-2(B)</div></div>
+      <div class="info-item"><div class="info-key">Subject</div><div class="info-val">Web Analytics Lab</div></div>
+      <div class="info-item"><div class="info-key">Code</div><div class="info-val" style="font-family:'JetBrains Mono',monospace;">24CAP-752</div></div>
+      <div class="info-item"><div class="info-key">Teacher</div><div class="info-val">Prabhjot Kaur</div></div>
+      <div class="info-item"><div class="info-key">Institute</div><div class="info-val">Chandigarh University</div></div>
     </div>
   </div>
+</div>
 
 </main>
 
-<!-- FOOTER -->
+<!-- ══════════ FOOTER ══════════ -->
 <footer class="site-footer">
   <div class="footer-text">
-    Web Analytics Final Project · <strong>Raja Kumar</strong> · UID: 24MCA20229 · MCA-2(B) · Subject: 24CAP-752<br>
-    University Institute of Computing, Chandigarh University, Gharuan, Mohali · Submitted to: <strong>Prabhjot Kaur</strong>
+    Web Analytics Lab — Final Project &nbsp;·&nbsp; <strong>Raja Kumar</strong> &nbsp;·&nbsp; UID: 24MCA20229 &nbsp;·&nbsp; MCA-2(B) &nbsp;·&nbsp; 24CAP-752<br>
+    University Institute of Computing &nbsp;·&nbsp; Chandigarh University, Gharuan, Mohali &nbsp;·&nbsp; Submitted to: <strong>Prabhjot Kaur</strong>
   </div>
 </footer>
 
 <script>
-  // ── NAV ──
-  function showSection(id, btn) {
-    document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
-    document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-    document.getElementById(id).classList.add('active');
-    btn.classList.add('active');
-  }
+/* ── THEME ── */
+function toggleTheme() {
+  var html = document.documentElement;
+  var isDark = html.getAttribute('data-theme') === 'dark';
+  html.setAttribute('data-theme', isDark ? 'light' : 'dark');
+  document.getElementById('themeLabel').textContent = isDark ? 'LIGHT' : 'DARK';
+  updateCharts();
+}
 
-  // ── CHART: Traffic Trend ──
-  new Chart(document.getElementById('trafficChart'), {
+/* ── NAV ── */
+function showSection(id, btn) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  btn.classList.add('active');
+}
+
+/* ── CHART COLOR HELPERS ── */
+function isDark() { return document.documentElement.getAttribute('data-theme') === 'dark'; }
+function gridColor() { return isDark() ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.05)'; }
+function tickColor() { return isDark() ? '#606070' : '#999999'; }
+
+var charts = {};
+
+function makeChart(id, config) {
+  if (charts[id]) charts[id].destroy();
+  charts[id] = new Chart(document.getElementById(id), config);
+}
+
+function buildTrafficChart() {
+  makeChart('trafficChart', {
     type: 'line',
     data: {
       labels: ['Oct 2025','Nov 2025','Dec 2025','Jan 2026','Feb 2026','Mar 2026'],
       datasets: [{
-        label: 'Sessions (Millions)',
-        data: [13.2, 14.8, 16.1, 15.4, 17.2, 18.4],
-        borderColor: '#c0392b',
-        backgroundColor: 'rgba(192,57,43,0.08)',
-        tension: 0.4,
-        fill: true,
-        pointRadius: 5,
-        pointBackgroundColor: '#c0392b',
-        pointBorderColor: '#fff',
-        pointBorderWidth: 2
+        label: 'Sessions (M)',
+        data: [13.2,14.8,16.1,15.4,17.2,18.4],
+        borderColor: '#e63327',
+        backgroundColor: 'rgba(230,51,39,0.08)',
+        tension: 0.45, fill: true,
+        pointRadius: 5, pointBackgroundColor: '#e63327',
+        pointBorderColor: isDark() ? '#16161d' : '#fff', pointBorderWidth: 2
       }]
     },
     options: {
       responsive: true, maintainAspectRatio: false,
       plugins: { legend: { display: false } },
       scales: {
-        y: { beginAtZero: false, ticks: { color: '#999', font: { size: 11 } }, grid: { color: 'rgba(0,0,0,0.04)' } },
-        x: { ticks: { color: '#999', font: { size: 11 } }, grid: { display: false } }
+        y: { beginAtZero: false, ticks: { color: tickColor(), font: { size: 11, family: 'JetBrains Mono' } }, grid: { color: gridColor() } },
+        x: { ticks: { color: tickColor(), font: { size: 11 } }, grid: { display: false } }
       }
     }
   });
+}
 
-  // ── CHART: Backlinks ──
-  new Chart(document.getElementById('backlinkChart'), {
+function buildBacklinkChart() {
+  makeChart('backlinkChart', {
     type: 'bar',
     data: {
       labels: ['Oct 2025','Nov 2025','Dec 2025','Jan 2026','Feb 2026','Mar 2026'],
       datasets: [
-        { label: 'New Backlinks', data: [1200,1850,2100,3200,4100,5800], backgroundColor: '#2980b9', borderRadius: 4 },
-        { label: 'Lost Backlinks', data: [200,380,290,410,520,680], backgroundColor: '#e74c3c', borderRadius: 4 }
+        { label: 'New Backlinks', data: [1200,1850,2100,3200,4100,5800], backgroundColor: '#3b82f6', borderRadius: 5 },
+        { label: 'Lost Backlinks', data: [200,380,290,410,520,680], backgroundColor: '#e63327', borderRadius: 5 }
       ]
     },
     options: {
       responsive: true, maintainAspectRatio: false,
-      plugins: { legend: { display: true, position: 'top', labels: { font: { size: 11 }, color: '#999', boxWidth: 10, padding: 16 } } },
+      plugins: { legend: { display: true, position: 'top', labels: { font: { size: 11 }, color: tickColor(), boxWidth: 10, padding: 16 } } },
       scales: {
-        y: { ticks: { color: '#999', font: { size: 11 } }, grid: { color: 'rgba(0,0,0,0.04)' } },
-        x: { ticks: { color: '#999', font: { size: 11 } }, grid: { display: false } }
+        y: { ticks: { color: tickColor(), font: { size: 11, family: 'JetBrains Mono' } }, grid: { color: gridColor() } },
+        x: { ticks: { color: tickColor(), font: { size: 11 } }, grid: { display: false } }
       }
     }
   });
+}
 
-  // ── CHART: Campaign ──
-  new Chart(document.getElementById('campaignChart'), {
+function buildCampaignChart() {
+  makeChart('campaignChart', {
     type: 'bar',
     data: {
-      labels: ['Facebook Traffic', 'Google Display', 'SendPulse Push', 'LinkedIn Organic', 'Google AdSense'],
+      labels: ['Facebook Traffic','Google Display','SendPulse Push','LinkedIn Organic','Google AdSense'],
       datasets: [
-        { label: 'CTR %', data: [4.2,3.8,5.1,2.4,1.9], backgroundColor: '#c0392b', borderRadius: 4 },
-        { label: 'CVR %', data: [5.8,4.9,6.2,3.1,2.7], backgroundColor: '#27ae60', borderRadius: 4 }
+        { label: 'CTR %', data: [4.2,3.8,5.1,2.4,1.9], backgroundColor: '#e63327', borderRadius: 5 },
+        { label: 'CVR %', data: [5.8,4.9,6.2,3.1,2.7], backgroundColor: '#22c55e', borderRadius: 5 }
       ]
     },
     options: {
       responsive: true, maintainAspectRatio: false,
-      plugins: { legend: { display: true, position: 'top', labels: { font: { size: 11 }, color: '#999', boxWidth: 10, padding: 16 } } },
+      plugins: { legend: { display: true, position: 'top', labels: { font: { size: 11 }, color: tickColor(), boxWidth: 10, padding: 16 } } },
       scales: {
-        y: { ticks: { color: '#999', font: { size: 11 }, callback: v => v + '%' }, grid: { color: 'rgba(0,0,0,0.04)' } },
-        x: { ticks: { color: '#999', font: { size: 11 }, autoSkip: false, maxRotation: 15 }, grid: { display: false } }
+        y: { ticks: { color: tickColor(), font: { size: 11, family: 'JetBrains Mono' }, callback: v => v + '%' }, grid: { color: gridColor() } },
+        x: { ticks: { color: tickColor(), font: { size: 11 }, autoSkip: false, maxRotation: 10 }, grid: { display: false } }
       }
     }
   });
+}
 
-  // ── ROI CALCULATOR ──
-  var roiChartInst = null;
-
-  function calcROI() {
-    var budget = parseInt(document.getElementById('budget').value);
-    var ctr    = parseFloat(document.getElementById('ctr').value);
-    var cpc    = parseInt(document.getElementById('cpc').value);
-    var aov    = parseInt(document.getElementById('aov').value);
-    var cvr    = parseFloat(document.getElementById('cvr').value);
-
-    document.getElementById('budgetVal').textContent = '₹' + budget.toLocaleString('en-IN');
-    document.getElementById('ctrVal').textContent    = ctr.toFixed(1) + '%';
-    document.getElementById('cpcVal').textContent    = '₹' + cpc;
-    document.getElementById('aovVal').textContent    = '₹' + aov;
-    document.getElementById('cvrVal').textContent    = cvr.toFixed(1) + '%';
-
-    var clicks  = Math.round(budget / cpc);
-    var orders  = Math.round(clicks * (cvr / 100));
-    var revenue = orders * aov;
-    var profit  = revenue - budget;
-    var roi     = Math.round(((revenue - budget) / budget) * 100);
-    var cac     = orders > 0 ? Math.round(budget / orders) : 0;
-    var roas    = budget > 0 ? (revenue / budget).toFixed(1) : '0';
-
-    document.getElementById('r-clicks').textContent  = clicks.toLocaleString('en-IN');
-    document.getElementById('r-orders').textContent  = orders.toLocaleString('en-IN');
-    document.getElementById('r-revenue').textContent = '₹' + revenue.toLocaleString('en-IN');
-    document.getElementById('r-profit').textContent  = (profit >= 0 ? '₹' : '-₹') + Math.abs(profit).toLocaleString('en-IN');
-    document.getElementById('r-roi').textContent     = roi + '%';
-    document.getElementById('r-cac').textContent     = '₹' + cac;
-    document.getElementById('r-roas').textContent    = roas + 'x';
-
-    var budgets = [10000,30000,50000,100000,200000,300000,500000];
-    var rois    = budgets.map(function(b) {
-      var c   = Math.round(b / cpc);
-      var o   = Math.round(c * cvr / 100);
-      var rev = o * aov;
-      return Math.round(((rev - b) / b) * 100);
-    });
-
-    if (roiChartInst) roiChartInst.destroy();
-    roiChartInst = new Chart(document.getElementById('roiChart'), {
-      type: 'line',
-      data: {
-        labels: ['₹10K','₹30K','₹50K','₹1L','₹2L','₹3L','₹5L'],
-        datasets: [{
-          label: 'ROI %',
-          data: rois,
-          borderColor: '#c0392b',
-          backgroundColor: 'rgba(192,57,43,0.08)',
-          tension: 0.3,
-          fill: true,
-          pointRadius: 5,
-          pointBackgroundColor: '#c0392b',
-          pointBorderColor: '#fff',
-          pointBorderWidth: 2
-        }]
-      },
-      options: {
-        responsive: true, maintainAspectRatio: false,
-        plugins: { legend: { display: false } },
-        scales: {
-          y: { ticks: { color: '#999', font: { size: 11 }, callback: v => v + '%' }, grid: { color: 'rgba(0,0,0,0.04)' } },
-          x: { ticks: { color: '#999', font: { size: 11 } }, grid: { display: false } }
-        }
+function buildROIChart(rois) {
+  makeChart('roiChart', {
+    type: 'line',
+    data: {
+      labels: ['₹10K','₹30K','₹50K','₹1L','₹2L','₹3L','₹5L'],
+      datasets: [{
+        label: 'ROI %',
+        data: rois,
+        borderColor: '#e63327',
+        backgroundColor: 'rgba(230,51,39,0.08)',
+        tension: 0.35, fill: true,
+        pointRadius: 5, pointBackgroundColor: '#e63327',
+        pointBorderColor: isDark() ? '#16161d' : '#fff', pointBorderWidth: 2
+      }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { display: false } },
+      scales: {
+        y: { ticks: { color: tickColor(), font: { size: 11, family: 'JetBrains Mono' }, callback: v => v + '%' }, grid: { color: gridColor() } },
+        x: { ticks: { color: tickColor(), font: { size: 11 } }, grid: { display: false } }
       }
-    });
-  }
+    }
+  });
+}
 
-  calcROI();
+function updateCharts() {
+  buildTrafficChart();
+  buildBacklinkChart();
+  buildCampaignChart();
+  var cpc = parseInt(document.getElementById('cpc').value);
+  var cvr = parseFloat(document.getElementById('cvr').value);
+  var aov = parseInt(document.getElementById('aov').value);
+  var budgets = [10000,30000,50000,100000,200000,300000,500000];
+  var rois = budgets.map(b => { var c=Math.round(b/cpc); var o=Math.round(c*cvr/100); var rev=o*aov; return Math.round(((rev-b)/b)*100); });
+  buildROIChart(rois);
+}
+
+/* ── ROI CALCULATOR ── */
+function calcROI() {
+  var budget = parseInt(document.getElementById('budget').value);
+  var ctr    = parseFloat(document.getElementById('ctr').value);
+  var cpc    = parseInt(document.getElementById('cpc').value);
+  var aov    = parseInt(document.getElementById('aov').value);
+  var cvr    = parseFloat(document.getElementById('cvr').value);
+
+  document.getElementById('budgetVal').textContent = '₹' + budget.toLocaleString('en-IN');
+  document.getElementById('ctrVal').textContent    = ctr.toFixed(1) + '%';
+  document.getElementById('cpcVal').textContent    = '₹' + cpc;
+  document.getElementById('aovVal').textContent    = '₹' + aov;
+  document.getElementById('cvrVal').textContent    = cvr.toFixed(1) + '%';
+
+  var clicks  = Math.round(budget / cpc);
+  var orders  = Math.round(clicks * (cvr / 100));
+  var revenue = orders * aov;
+  var profit  = revenue - budget;
+  var roi     = Math.round(((revenue - budget) / budget) * 100);
+  var cac     = orders > 0 ? Math.round(budget / orders) : 0;
+  var roas    = budget > 0 ? (revenue / budget).toFixed(1) : '0';
+
+  document.getElementById('r-clicks').textContent  = clicks.toLocaleString('en-IN');
+  document.getElementById('r-orders').textContent  = orders.toLocaleString('en-IN');
+  document.getElementById('r-revenue').textContent = '₹' + revenue.toLocaleString('en-IN');
+  document.getElementById('r-profit').textContent  = (profit >= 0 ? '' : '-') + '₹' + Math.abs(profit).toLocaleString('en-IN');
+  document.getElementById('r-roi').textContent     = roi + '%';
+  document.getElementById('r-cac').textContent     = '₹' + cac;
+  document.getElementById('r-roas').textContent    = roas + 'x';
+
+  var budgets = [10000,30000,50000,100000,200000,300000,500000];
+  var rois    = budgets.map(function(b) {
+    var c=Math.round(b/cpc), o=Math.round(c*cvr/100), rev=o*aov;
+    return Math.round(((rev-b)/b)*100);
+  });
+  buildROIChart(rois);
+}
+
+/* ── INIT ── */
+buildTrafficChart();
+buildBacklinkChart();
+buildCampaignChart();
+calcROI();
 </script>
 </body>
 </html>
